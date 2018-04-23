@@ -61,8 +61,9 @@ class PostUserController extends Controller
         unset($data['image']);
         unset($data['tags']);
         $data['image']=$imageName;
-        $user= Post::create($data);
-         return $user;
+        $data['slug']=str_slug($data['title']);
+        $post= Post::create($data);
+        return $post;
         // return redirect()->back();
     
     }
@@ -79,9 +80,15 @@ class PostUserController extends Controller
         $id=$request->only(['id']);
         $boolean=Post::find($id)->first()->update($data);
         if ($boolean) {
-        return Post::find($id)->first();
+            $post=Post::find($id)->first();
+            $post['created_up']= $post['created_up'];
+            return $post;
         }else{
             return response()->json(['error'=>'500']);
         }
+    }
+    public function getReason($id){
+        $post=Post::where('id',$id)->first();
+        return $post;
     }
 }

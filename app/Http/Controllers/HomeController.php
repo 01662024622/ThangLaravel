@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Socialite;
+use App\User;
+use Hash;
+use Auth;
 class HomeController extends Controller
 {
     /**
@@ -21,8 +24,28 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+     public function redirectToProvider()
     {
-        return view('home');
+        return Socialite::driver('google')->redirect();
+    }
+    public function handleProviderCallback()
+    {
+        $user = Socialite::driver('google')->stateless()->user();
+
+
+        
+        $data['email']=$user->email;
+        $user=User::where('email',$data['email'])->first();
+        if (!isset($user)) {
+            $data['password']=Hash::make($user->id);
+            $data['avata']=$user->avatar;
+            $data['name']=$user->getName();
+            $data['address']='user comment form email';
+            $user=User::create($data);
+        }
+        $id=$user->id;
+         Auth::loginUsingId($id);
+        $url = 'poster/'.session('slug');
+        return redirect($url);     
     }
 }

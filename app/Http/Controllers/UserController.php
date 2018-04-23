@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Http\Requests\UserRequest;
+
+use App\Http\Requests\UserUpdateRequest;
+
 use App\User;
+use App\Post;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -13,9 +18,18 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     public function index(){
+        $noticePost=Post::where('status','0')->get();
+        $sumPost=0;
+        foreach ($noticePost as $key => $value) {
+           $sumPost=$sumPost+1;
+        }
+        $sumNotice=0;
+        foreach ($noticePost as $key => $value) {
+           $sumNotice=$sumNotice+1;
+        }
     	$users=User::orderBy('id','DESC')->get();
     	$currentUser = Auth::user();
-    	return view('admins.userTable',['users'=>$users,'currentUser'=>$currentUser]);
+    	return view('admins.userTable',['users'=>$users,'currentUser'=>$currentUser,'noticePost'=>$noticePost,'sumNotice'=>$sumNotice,'sumPost'=>$sumPost]);
 	}
 	public function getData($id){
     	$users=User::find($id);
@@ -29,30 +43,12 @@ class UserController extends Controller
 		$data=User::find($id)->delete();
 		return response()->json($data);
 	}
-	public function store(Request $request) {
+	public function store(UserRequest $request) {
 		if ($request->hasFile('image')) {
-			# code...
-		$request->validate([
-			'name'		=> 'required',
-			'email'		=> 'required',
-			'phone'		=> 'required',
-			'address'	=> 'required',
-			'password'	=> 'required',
-            'image'		=> 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
-        ]);
         $imageName= 'http://localhost:8800/images/'.time().'.'.$request->image->getClientOriginalExtension();
 
         $request->image->move(public_path('images'), $imageName);
 		}else{
-			$request->validate([
-			'name'		=> 'required',
-			'email'		=> 'required',
-			'phone'		=> 'required',
-			'address'	=> 'required',
-			'password'	=> 'required',
-
-        ]);
 			$imageName='http://localhost:8800/images/userDefault.png';
 		}
         
@@ -64,16 +60,7 @@ class UserController extends Controller
 		 return $user;
 		// return redirect()->back();
 	}
-	public function updateUser(Request $request) {
-		$request->validate([
-			'id'		=> 'required',
-			'name'		=> 'required',
-			'email'		=> 'required',
-			'phone'		=> 'required',
-			'address'	=> 'required',
-			'image'		=> 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
-        ]);
+	public function updateUser(UserUpdateRequest $request) {
         $data=$request->all();
         unset($data['image']);
         unset($data['id']);

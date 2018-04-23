@@ -65,12 +65,9 @@
       <div class="form-group">
         <label class="control-label col-sm-2" for="name">Name:</label>
         <input type="text" class="form-control" id="ename" placeholder="Enter name" name="name">
-        @if ($errors->has('name'))
-        <span class="errors">{{$errors->first('name')}}</span>
-        @endif
       </div>
       <select name="ecategory_id" id="eparent_id" style="width: 100%" class="form-control">
-            <option  value="0" style="font-weight: 900;color:red"><b> <strong>Main Category </strong></b> </option>}
+            <option  value="0" style="font-weight: 900;color:red"><b> <strong>Main Category </strong></b> </option>
             @foreach($categories as $category)
             <option value="{{$category['id']}}">{{$category['name']}}</option>}
             option
@@ -107,9 +104,6 @@
       <div class="form-group">
         <label class="control-label col-sm-2" for="name">Name:</label>
         <input type="text" class="form-control" id="name" placeholder="Enter name" name="name">
-        @if ($errors->has('name'))
-        <span class="errors">{{$errors->first('name')}}</span>
-        @endif
       </div>
        <div class="form-group">
           <label class="control-label col-sm-2 " for="description">Category:</label>
@@ -122,9 +116,6 @@
           </select>
         </div>
       <div class="form-group">
-        @if ($errors->has('phone'))
-        <span class="errors">{{$errors->first('phone')}}</span>
-        @endif
         <label class="control-label" for="phone">Sort_Order:</label>        
         <input type="tel" name="sort_order"  class="form-control" id="sort_order" value="" placeholder="">
       </div>
@@ -151,7 +142,7 @@
         });
         $('#StoreBtn').on('click',function(e){
           e.preventDefault();
-          console.log($('#parent_id').val());
+          console.log($('#name').val());
           $.ajax({
             type:'post',
             url:"{{asset('admin/categories/store')}}",
@@ -184,7 +175,26 @@
                 $('#create').modal('hide');
             
           }, error: function (xhr, ajaxOptions, thrownError) {
-            console.log(xhr);
+            if (!checkNull(xhr.responseJSON.errors)) {
+                  console.log(xhr.responseJSON.errors);
+                  $('p#sperrors').remove();
+                  if(!checkNull(xhr.responseJSON.errors.name))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.name.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.name[i]+'</p>';
+                    
+                    $(html).insertAfter('#name');
+                    }
+                  };
+                  if(!checkNull(xhr.responseJSON.errors.sort_order))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.sort_order.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.sort_order[i]+'</p>';
+                    console.log(html);
+                    $(html).insertAfter('#sort_order');
+                    }
+                  };
+                }
             toastr.error(xhr.responseJSON.message);
 
           },
@@ -221,7 +231,6 @@
         $.ajax({
           type:'post',
           url: "{{ asset('admin/categories/update') }}",
-
           data:{
             name:$('#ename').val(),
             parent_id:$('#eparent_id').val(),
@@ -230,7 +239,6 @@
           },
           success: function(response){
             console.log(response);
-        // var result = JSON.parse(response);
         setTimeout(function () {
           toastr.success(response.name+'has been added');
          
@@ -245,14 +253,30 @@
         '<td>'+
         '<a href="javascript:;"  onclick="editCategory('+response.id+') " class="btn btn-success" data-toggle="modal" data-target="#editcategory"  ><i class="fa fa-edit"></i> Sửa </a>' + '<br>'+ '<br>'+
         ' <a class="btn btn-danger fa fa-trash-o" onclick="alDelete('+response.id+')" type="submit"> Delete</button>'+
-        '</td>'
-
-        console.log(html);
+        '</td>';
         $('#category_'+response.id).html(html);
       }, error: function (xhr, ajaxOptions, thrownError) {
-        console.log(xhr);
-        toastr.error(xhr.responseJSON.message);
-        toastr.error(xhr.responseJSON.message);
+        if (!checkNull(xhr.responseJSON.errors)) {
+                  console.log(xhr.responseJSON.errors);
+                  $('p#sperrors').remove();
+                  if(!checkNull(xhr.responseJSON.errors.name))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.name.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.name[i]+'</p>';
+                    
+                    $(html).insertAfter('#name');
+                    }
+                  };
+                  if(!checkNull(xhr.responseJSON.errors.sort_order))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.sort_order.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.sort_order[i]+'</p>';
+                    console.log(html);
+                    $(html).insertAfter('#sort_order');
+                    }
+                  };
+                }
+            toastr.error(xhr.responseJSON.message);
 
       },
 
@@ -319,6 +343,8 @@
         }
       });
       };
-
+      function checkNull(value){
+          return (value == null || value === '');
+      }
     </script>
     @endsection

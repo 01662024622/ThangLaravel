@@ -27,8 +27,8 @@
         <th>ID</th>
         <th>Avata</th>
         <th>Title</th>
-        <th>Description</th>
-        <th>Content</th>
+        <th>Updated_at</th>
+        <th>Status</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -40,25 +40,28 @@
         <td>{{$count++}}</td>
         <td><img src="{{$post['image']}}" class="img img-responsive" width="200px" alt=""></td>
         <td>{{$post['title']}}</td>
-        <td>{!! $post['description'] !!}</td>
-        <td>{!! $post['content'] !!}</td>
-
+        <td>{!! $post['updated_at']->diffForHumans() !!}</td>
         <td>
-         @if($post['status']==0)
-         <a href="#" class="btn btn-info">Browsing</a>
+          <a href="#" class="btn btn-primary" href="javascript:;" onclick="getStatus({{$post['id']}})" data-toggle="modal" data-target="#changeStatus">Change Status</a>
+
+         <br><br>
+          @if($post['status']==0)
+         <a href="#" class="btn btn-info"> Browsing</a>
          @endif
          @if($post['status']==1)
-         <a href="#" class="btn btn-success">Posted</a>
+         <a href="#" class="btn btn-success"> Posted</a>
          @endif
          @if($post['status']==2)
-         <a href="#" class="btn btn-danger">Cancelled</a>
-         @endif
+         <a href="#" class="btn btn-danger"> Cancelled</a><br><br>
+         <a href="javascript:;" onclick="getReason({{$post['id']}})" data-toggle="modal" data-target="#reason" class="btn btn-warning fa fa-exclamation-circle"> Reason</a>
+         @endif</td>
+        <td>
+          <a class="btn btn-primary fa fa-eye" onclick="showPost({{$post['id']}})" data-toggle="modal" href='#showPost'> Show</a>
+          <br><br>
+          <a href="javascript:;" onclick="editPost({{$post['id']}})" class="btn btn-success" data-toggle="modal" data-target="#editPost" ><i class="fa fa-wrench"></i> Repair </a>
          <br>
          <br>
-         <a href="javascript:;" onclick="editPost({{$post['id']}})" class="btn btn-success" data-toggle="modal" data-target="#editPost" ><i class="fa fa-edit"></i> Repair </a>
-         <br>
-         <br>
-         <a  class="btn btn-danger fa fa-trash-o" onclick="alDelete({{$post['id']}})" type="submit">Delete</a>
+         <a  class="btn btn-danger fa fa-trash-o" onclick="alDelete({{$post['id']}})" type="submit"> Delete</a>
        </td>
      </tr>
      @endforeach
@@ -87,16 +90,8 @@
           <div class="form-group">
             <label for="">Description:</label>
             <input type="text" class="form-control" id="edescription" placeholder="Please Enter A Price...." name="mobile">
-            @if ($errors->has('description'))
-              <span class="invalid-feedback">
-                <strong>{{ $errors->first('description') }}</strong>
-              </span>
-              @endif
           </div>
-          <div class="form-group">
-           @if ($errors->has('content'))
-           <span class="errors">{{$errors->first('content')}}</span>
-           @endif
+          <div class="form-group" id="econtentdiv">
            <div>  
              <label class="control-label" for="econtent">Content:</label>        
              <textarea name="econtent" id="econtent" row="10" col="20"></textarea>
@@ -155,7 +150,7 @@
         <span class="errors">{{$errors->first('description')}}</span>
         @endif
       </div> 
-      <div class="form-group">
+      <div class="form-group" id="contentdiv">
 
 
        @if ($errors->has('content'))
@@ -186,7 +181,7 @@
     <br>
     <br>
     <div class="portlet-title">
-     <div class="form-group">        
+     <div class="form-group" id="tag">        
       <label class="control-label col-sm-2" for="description">Tag:</label>
       <input type="text" name="tags" id='tags' data-role="tagsinput" value="" placeholder="">       
     </div>
@@ -199,6 +194,68 @@
 </div>
 </div>
 </div>
+</div>
+<!-- modal reason -->
+<div class="modal fade" id="reason">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Reason</h4>
+      </div>
+      <div class="modal-body">
+        <p id="reason">
+          
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="changeStatus">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Modal title</h4>
+      </div>
+          <input type="hidden" name="idStatus" id="idStatus" value="">
+          <div class="form-group" id="changForm">
+            <label for="">Status</label>
+            <select name="changeStatus" id="changeStatus" class="form-control">
+              <option value="0">Browsing</option>
+              <option value="1">Posted</option>
+              <option value="2" id="Ocancelled">Cancelled</option>
+            </select>
+          </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="changeBtn">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Show Post -->
+
+<div class="modal fade" id="showPost">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
 </div>
 @endsection
 @section('js')
@@ -245,7 +302,7 @@
             processData: false,
             contentType: false,
             success:function(response){
-                 console.log(response);
+                 
                  setTimeout(function () {
                  toastr.success('has been added');
                   // window.location.href="{{route('posts.index')}}";
@@ -257,22 +314,64 @@
                 '<td>'+response.id+'</td>'+
                 '<td><img src="'+response.image+'" class="img img-responsive" width="200px" alt="">'+'</td>'+
                 '<td>'+response.title+'</td>'+
-                '<td>'+response.description+'</td>'+
-                '<td>'+response.content+'</td>'+
+                '<td>'+response.updated_at+'</td>'+
                 '<td>'+
-                '<a href="#" class="btn btn-info">Browsing</a>'+'<br>'+'<br>'+
+                '<a href="#" class="btn btn-primary" href="javascript:;" onclick="getStatus('+response.id+')" data-toggle="modal" data-target="#changeStatus">Change Status</a>'+'<br>'+'<br>'+
+                '<a href="#" class="btn btn-info">Browsing</a>'+'</td>'+
+                '<td>'+
                 '<a href="javascript:;"  onclick="editPost('+response.id+') " class="btn btn-success" data-toggle="modal" data-target="#editPost"  ><i class="fa fa-edit"></i> Repair </a>'+'<br>'+'<br>'+
                 '<a  class="btn btn-danger fa fa-trash-o" onclick="alDelete('+response.id+')" type="submit">Delete</a>'
 
                 +
-                '</td>'+
-                '</tr>';
-                console.log(html);
+                '</td>';
+                
                 $('tbody').prepend(html);
                 $('#create').modal('hide');
-          }, error: function (xhr, ajaxOptions, thrownError) {
-            console.log(xhr.responseJSON.errors.image[0]);
-            toastr.error(xhr.responseJSON.errors);
+          },  error: function (xhr, ajaxOptions, thrownError) {
+            
+            if (!checkNull(xhr.responseJSON.errors)) {
+              $('p#sperrors').remove();
+            if(!checkNull(xhr.responseJSON.errors.title))
+            {
+              for (var i = 0; i < xhr.responseJSON.errors.title.length; i++) {
+              var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.title[i]+'</p>';
+              
+              $(html).insertAfter('#title');
+
+              }
+            };
+            if(!checkNull(xhr.responseJSON.errors.content))
+            {
+              for (var i = 0; i < xhr.responseJSON.errors.content.length; i++) {
+              var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.content[i]+'</p>';
+              
+              $(html).insertAfter('#contentdiv');
+
+              }
+            };
+            if(!checkNull(xhr.responseJSON.errors.description))
+             {
+              for (var i = 0; i < xhr.responseJSON.errors.description.length; i++) {
+              var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.description[i]+'</p>';
+              
+              $(html).insertAfter('#description');
+
+              }
+            };
+            if(!checkNull(xhr.responseJSON.errors.tags))
+             {
+              for (var i = 0; i < xhr.responseJSON.errors.tags.length; i++) {
+              var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.tags[i]+'</p>';
+              
+              $(html).insertAfter('#tag');
+
+              }
+            }
+            if (!checkNull(xhr.responseJSON.message)) {
+
+            toastr.error(xhr.responseJSON.message);
+            }
+          };
 
           },
 
@@ -302,7 +401,7 @@ $('#UpdateBtn').on('click',function(e){
             processData: false,
             contentType: false,
           success: function(response){
-            console.log(response);
+            
         // var result = JSON.parse(response);
         setTimeout(function () {
           toastr.success(response.name+'has been added');
@@ -314,24 +413,51 @@ $('#UpdateBtn').on('click',function(e){
         '<td>'+response.id+'</td>'+
                 '<td><img src="'+response.image+'" class="img img-responsive" width="200px" alt="">'+'</td>'+
                 '<td>'+response.title+'</td>'+
-                '<td>'+response.description+'</td>'+
-                '<td>'+response.content+'</td>'+
+                '<td>'+response.updated_at+'</td>'+
                 '<td>'+
-                '<a href="#" class="btn btn-info">Browsing</a>'+'<br>'+'<br>'+
+                '<a href="#" class="btn btn-primary" href="javascript:;" onclick="getStatus('+response.id+')" data-toggle="modal" data-target="#changeStatus">Change Status</a>'+'<br>'+'<br>'+
+                '<a href="#" class="btn btn-info">Browsing</a>'+'</td>'+
+                '<td>'+
                 '<a href="javascript:;"  onclick="editPost('+response.id+') " class="btn btn-success" data-toggle="modal" data-target="#editPost"  ><i class="fa fa-edit"></i> Repair </a>'+'<br>'+'<br>'+
                 '<a  class="btn btn-danger fa fa-trash-o" onclick="alDelete('+response.id+')" type="submit">Delete</a>'
 
                 +
                 '</td>';
 
-        console.log(html);
+        
         $('#user_'+response.id).html(html);
-      }, error: function (xhr, ajaxOptions, thrownError) {
-        console.log(xhr);
-        toastr.error(xhr.responseJSON.message);
-        toastr.error(xhr.responseJSON.message);
+      },error: function (xhr, ajaxOptions, thrownError) {
+            $("p.sperrors").remove();
+            if(!checkNull(xhr.responseJSON.errors.title))
+            { 
+              for (var i = 0; i < xhr.responseJSON.errors.title.length; i++) {
+              var html='<p class="sperrors" style="color:red">'+xhr.responseJSON.errors.title[i]+'</p>';
+              
+              $(html).insertAfter('#etitle');
 
-      },
+              }
+            };
+            if(!checkNull(xhr.responseJSON.errors.content))
+            {
+              for (var i = 0; i < xhr.responseJSON.errors.content.length; i++) {
+              var html='<p class="sperrors" style="color:red">'+xhr.responseJSON.errors.content[i]+'</p>';
+              
+              $(html).insertAfter('#econtentdiv');
+
+              }
+            };
+            if(!checkNull(xhr.responseJSON.errors.description))
+             {
+              for (var i = 0; i < xhr.responseJSON.errors.description.length; i++) {
+              var html='<p  class="sperrors" style="color:red">'+xhr.responseJSON.errors.description[i]+'</p>';
+              
+              $(html).insertAfter('#edescription');
+
+              }
+            };
+            toastr.error(xhr.responseJSON.message);
+
+          },
 
     })
       });
@@ -341,7 +467,7 @@ $('#UpdateBtn').on('click',function(e){
 
   // get data for form update
   function editPost(id) {
-    console.log(id);
+    
         // $('#editPost').modal('show');
 
         $.ajax({
@@ -349,7 +475,7 @@ $('#UpdateBtn').on('click',function(e){
           url: "posts/edit/" + id,
 
           success: function(response)
-          {console.log(response);
+          {
             CKEDITOR.instances.econtent.setData(response.content);
             $('#etitle').val(response.title),
             $('#edescription').val(response.description),
@@ -363,12 +489,32 @@ $('#UpdateBtn').on('click',function(e){
         });
 
       }
+    function showPost(id) {
+    
+        // $('#editPost').modal('show');
+
+        $.ajax({
+          type: "GET",
+          url: "posts/edit/" + id,
+
+          success: function(response)
+          {
+            console.log(response);
+            
+
+          },
+          error: function (xhr, ajaxOptions, thrownError) {
+            toastr.error(thrownError);
+          }
+        });
+
+      }
       // Update function
       
 
       // Delete function
       function alDelete(id){
-        console.log(id);
+        
         var path = "posts/" + id;
         swal({
           title: "Bạn có chắc muốn xóa?",
@@ -384,7 +530,7 @@ $('#UpdateBtn').on('click',function(e){
         if (isConfirm) {
           $.ajax({
             type: "delete",
-            url: path,
+            url: "{{ asset('admin/posts') }}"+'/'+id,
             success: function(res)
             {
 
@@ -405,7 +551,127 @@ $('#UpdateBtn').on('click',function(e){
         }
       });
       };
+      function checkNull(value){
+          return (value == null || value === '');
+      }
+      
+      function getReason(id){
+        $.ajax({
+            type: "post",
+            url: "posts/getReason/"+id,
+            success: function(response){
+            
+              if (response.notice==null) {
+                $("p#reason").append("Bạn Đã Không Để Lại Lý Do");
+              }else{
+                $("p#reason").append(response.notice);
+              }
+            },
+              error: function (xhr, ajaxOptions, thrownError) {
+                toastr.error(thrownError);
+              }
+      })
+    }
+    
+    function getStatus(id){
+      $.ajax({
+            type: "post",
+            url: "posts/getReason/"+id,
+            success: function(response)
+            { 
+              $('#idStatus').val(response.id);
+              var status=response.status;
+              switch(status) {
+                case 0:
+                $('select#changeStatus').val('0').change();
+                $('#ereasondiv').remove();
+                  break;
+                case 1 :
+                  $("#ereasondiv").remove();
+                  $('select#changeStatus').val('1').change();
+                  break; 
+                case 2 :
+                  $('div#ereasondiv').remove();
+                  $('select#changeStatus').val('2').change();
+                  break;
+      }
+            },
+              error: function (xhr, ajaxOptions, thrownError) {
+                toastr.error(thrownError);
+            }
+      })     
+    }
+    $('select#changeStatus').on('change', function() {
+       switch(this.value) {
+        case '0':
+        $('#ereasondiv').remove();
+          break;
+        case '1':
+          $('#ereasondiv').remove();
+          break; 
+        case '2':   
+        $("div#ereasondiv").remove();
+          var html='<div class="form-group" id="ereasondiv">'+
+            '<label class="control-label" for="ereason">Reason:</label>'+        
+            '<div>'+ 
+              '<textarea name="ereason" id="ereason" row="10" col="20"></textarea>'+
+            '</div>'+
+         '</div>';
+         $(html).insertAfter('#changForm');
+         CKEDITOR.replace( 'ereason' );
+          break;
+      }
+    })
+    $('#changeBtn').on('click',function(e){
+       e.preventDefault();
+       if (CKEDITOR.instances.ereason) {
 
+       var notice = CKEDITOR.instances.ereason.getData();
+       }else{
+        notice="";
+       }
+       $.ajax({
+            type: "post",
+            url: "posts/changeStatus",
+            data:{
+              status:$('select#changeStatus').val(),
+              notice:notice,
+              id:$('#idStatus').val(),
+            },
+            success: function(response)
+            {
+              switch(response.status) {
+                case 0:
+                var plushtml='<a href="#" class="btn btn-info"> Browsing</a>';         
+                  break;
+                case 1:
+                  var plushtml='<a href="#" class="btn btn-success"> Posted</a>';
+                  break; 
+                case 2: 
+                  var plushtml='<a href="#" class="btn btn-danger"> Cancelled</a><br><br>'+
+                  '<a href="javascript:;" onclick="getReason('+response.id+')" data-toggle="modal" data-target="#reason" class="btn btn-warning fa fa-exclamation-circle"> Reason</a>';
+                  break;
+                }
+             var html=
+                '<td>'+response.id+'</td>'+
+                '<td><img src="'+response.image+'" class="img img-responsive" width="200px" alt="">'+'</td>'+
+                '<td>'+response.title+'</td>'+
+                '<td>'+response.updated_at+'</td>'+
+                '<td>'+
+                '<a href="#" class="btn btn-primary" href="javascript:;" onclick="getStatus('+response.id+')" data-toggle="modal" data-target="#changeStatus">Change Status</a>'+'<br>'+'<br>'+plushtml+
+                '<td>'+
+                '<a href="javascript:;"  onclick="editPost('+response.id+') " class="btn btn-success" data-toggle="modal" data-target="#editPost"  ><i class="fa fa-edit"></i> Repair </a>'+'<br>'+'<br>'+
+                '<a  class="btn btn-danger fa fa-trash-o" onclick="alDelete('+response.id+')" type="submit">Delete</a>'+
+                '</td>';
+              $('#user_'+response.id).html(html);
+                    $('#changeStatus').modal('hide');
+                  
+            },
+              error: function (xhr, ajaxOptions, thrownError) {
+                toastr.error(thrownError);
+              }
+      })
+    });
     </script>
     @endsection
   

@@ -7,6 +7,8 @@ use App\Post;
 use App\User;
 use App\Category;
 use Illuminate\Support\Facades\Auth;
+use Session;
+
 
 class FontController extends Controller
 {
@@ -46,6 +48,8 @@ class FontController extends Controller
     }
     public function post($slug){
        // header and footer
+        session()->regenerate();
+        Session::put('slug', $slug);
         $categories=Category::all();
         $subCategories=Category::all();
 
@@ -63,10 +67,10 @@ class FontController extends Controller
              }else {$value['user_id']="Admin";
             }
         }
-        $post=Post::where('slug',$slug)->get()->first();
-        $data=User::where('id',$post->user_id)->get()->first();
-            
-            if (!empty($data)) {
+        $post=Post::where('slug',$slug)->first();
+        $data=User::where('id',$post->user_id)->first();
+            // dd(isset($data));
+            if (isset($data)) {
                 
                  $post['user_id']=$data->name;
                 
@@ -102,6 +106,7 @@ class FontController extends Controller
             }
         }
         $userComment=Auth::user();
+        // dd($userComment);
         return view('font_end/post',['post'=>$post,'comments'=>$comments,'subcomments'=>$subcomments,'newPosts'=>$newPosts,'users'=>$users,'categories'=>$categories,'subCategories'=>$subCategories,'userComment'=>$userComment]);
         }
          public function category($slug){
@@ -110,7 +115,7 @@ class FontController extends Controller
         $categories=Category::all();
         $subCategories=Category::all();
 
-        $users=User::paginate(6);
+        $users=User::paginate(5);
         // body
 
         $newPosts=Post::where('status',1)->orderBy('id', 'desc')->paginate(5);
@@ -126,6 +131,7 @@ class FontController extends Controller
         }
         $main=Category::where('name',$slug)->first();
         $posts=Post::where('status',1)->where('category_id',$main->id)->get();
+        // dd($main->id);
          foreach ($posts as $key => $post) {
         $data=User::where('id',$post->user_id)->get()->first();
             

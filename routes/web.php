@@ -10,16 +10,28 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('xxx', function(){
+	return view('xxx');
+});
+
+Route::get('crawler', function() {
+    $crawler = Goutte::request('GET', 'http://dantri.com.vn/su-kien.htm');
+    $crawler->filter('a.fon6')->each(function ($node) {
+      echo $node->text(). "<br>";
+    });
+});
 Auth::routes();
 Route::middleware('auth')->group(function(){
 
-Route::get('posts', 'UserController\PostUserController@index')->name('home');
-Route::get('postedPosts', 'UserController\PostUserController@postedPosts')->name('home');
-Route::get('browsingPosts', 'UserController\PostUserController@browsingPosts')->name('home');
-Route::get('cancelledPosts', 'UserController\PostUserController@cancelledPosts')->name('home');
-Route::post('posts/store', 'UserController\PostUserController@store')->name('home');
-Route::get('posts/edit/{id}', 'UserController\PostUserController@getData')->name('home');
-Route::post('posts/update', 'UserController\PostUserController@updatePost')->name('home');
+Route::get('posts', 'UserController\PostUserController@index');
+Route::get('postedPosts', 'UserController\PostUserController@postedPosts');
+Route::get('browsingPosts', 'UserController\PostUserController@browsingPosts');
+Route::get('cancelledPosts', 'UserController\PostUserController@cancelledPosts');
+Route::post('posts/store', 'UserController\PostUserController@store');
+Route::get('posts/edit/{id}', 'UserController\PostUserController@getData');
+Route::delete('posts/{id}', 'UserController\PostUserController@delete');
+Route::post('posts/update', 'UserController\PostUserController@updatePost');
+Route::post('getReason/{id}', 'UserController\PostUserController@getReason');
 });
 Route::group(['prefix'=>'admin'], function() {
 		/*
@@ -84,14 +96,21 @@ Route::group(['prefix'=>'admin'], function() {
 				
 
 				Route::get('/','PostController@index')->name('posts.index');
+				Route::get('browsingPosts','PostController@browsingPosts')->name('posts.index');
+				Route::get('postedPosts','PostController@postedPosts')->name('posts.index');
+				Route::get('cancelledPosts','PostController@cancelledPosts');
 
 				Route::delete('/{id}','PostController@delete')->name('post.delete');
 
 				Route::post('store','PostController@store')->name('post.store');
 
+				Route::post('changeStatus','PostController@changeStatus');
+
 				Route::get('edit/{id}','PostController@getData')->name('post.show');
 
 				Route::post('update','PostController@updatePost')->name('post.update');
+
+				Route::post('getReason/{id}','PostController@getReason');
 				
 			});
 			Route::group(['prefix'=>'categories'],function(){
@@ -211,7 +230,5 @@ Route::post('upComment','CommentController@createComment');
 *@return 
 */
 
-Route::get('login/google', 'Auth\LoginController@redirectToProvider');
-Route::get('login/google/callback', 'Auth\LoginController@handleProviderCallback');
-Route::get('/redirect', 'Auth\LoginController@redirect');
-Route::get('/callback', 'Auth\LoginController@callback');
+Route::get('login/google', 'HomeController@redirectToProvider');
+Route::get('login/google/callback', 'HomeController@handleProviderCallback');

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    protected $fillable=['title','description','content','image','status','category_id','user_id','slug',];
+    protected $fillable=['title','description','content','image','status','category_id','user_id','slug','notice'];
     public static function storeData($data){
     		return Post::create($data);
 

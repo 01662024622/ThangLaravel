@@ -22,6 +22,7 @@ class CreatePostsTable extends Migration
             $table->integer('category_id');
             $table->integer('user_id');
             $table->string('slug');
+            $table->string('notice');
             $table->integer('status')->default('0');
             $table->timestamps();
         });

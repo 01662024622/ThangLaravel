@@ -112,16 +112,20 @@
           <li class="dropdown notifications-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <i class="fa fa-bell-o"></i>
-              <span class="label label-warning">10</span>
+              @if ($sumNotice!=='0')
+              <span class="label label-warning">{{$sumNotice}}</span>
+              @endif
             </a>
             <ul class="dropdown-menu">
-              <li class="header">You have 10 notifications</li>
+              <li class="header">You have {{$sumNotice}} notifications</li>
               <li>
-                <!-- inner menu: contains the actual data -->
                 <ul class="menu">
                   <li>
-                    <a href="#">
-                      <i class="fa fa-users text-aqua"></i> 5 new members joined today
+                    <a href="{{ asset('admin/posts/browsingPosts') }}">
+                      @if ($sumPost!==0)
+                        {{-- expr --}}
+                      <i class="fa fa-paste"></i> Have {{$sumPost}} New Posts has not been approved
+                      @endif
                     </a>
                   </li>
                 </ul>
@@ -252,17 +256,32 @@
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">MAIN NAVIGATION</li>
         <li class="">
+          <a href="{{ asset('admin/posts') }}">
+            <i class="fa fa-files-o"></i> <span>All Posts</span>
+          </a>
+        </li>
+        <li class="">
+          <a href="{{ asset('admin/posts/browsingPosts') }}">
+            <i class="fa fa-check"></i> <span>Browsing Posts</span>
+          </a>
+        </li>
+        <li class="">
+          <a href="{{ asset('admin/posts/postedPosts') }}">
+            <i class="fa fa-bandcamp"></i> <span>Posted Posts</span>
+          </a>
+        </li>
+        <li class="">
+          <a href="{{ asset('admin/posts/cancelledPosts') }}">
+            <i class="fa fa-trash-o"></i> <span>Cancelled Posts</span>
+          </a>
+        </li>
+        <li class="">
           <a href="{{ asset('admin/users') }}">
             <i class="fa fa-users"></i> <span>Users</span>
           </a>
           
         </li>
-        <li class="">
-          <a href="{{ asset('admin/posts') }}">
-            <i class="fa fa-files-o"></i> <span>Posts</span>
-          </a>
-          
-        </li>
+        
         <li class="">
           <a href="{{ asset('admin/categories') }}">
             <i class="fa fa-archive"></i>

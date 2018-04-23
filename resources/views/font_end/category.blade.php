@@ -34,7 +34,7 @@
                                 </span>
                             </span>
                                 
-                            <a href="{{ asset('poster/'.$post->slug) }}"><img src="{{ asset($post->image) }}" alt="Gallery"></a>
+                            <a href="{{ asset('poster/'.$post->slug) }}"><img src="{{ asset($post->image) }}" alt="Gallery" class="img" style="height: 200px"></a>
                             <div class="project-details"><a href="{{ asset('poster/'.$post->slug) }}" style="height: 50px">{{$post->title}}</a>
                                 {{$post->description}}</div>
                         </li>
@@ -119,7 +119,7 @@
             <!-- Client Logo Thumbs-->
             <ul class="client-logos">
                  @foreach($users as $user)
-                <li><a href="#" class="client-link"><img src="{{ asset($user->avata) }}" alt="Client"></a></li>
+                <li><a href="#" class="client-link"><img src="{{ asset($user->avata) }}" alt="Client" class="img" style="height: 100px; width: 100px"></a></li>
                 @endforeach
             </ul>
 

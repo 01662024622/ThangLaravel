@@ -69,15 +69,13 @@ class LoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function redirectToProvider()
+    public function logout(Request $request)
     {
-        return Socialite::driver('google')->redirect();
-    }
-    public function handleProviderCallback()
-    {
-        $user = Socialite::driver('google')->stateless()->user();
-        dd($user);
-        $user->token;
+        $this->guard('web')->logout();
+
+        // $request->session()->invalidate();
+
+        return redirect('login');
     }
    
 }

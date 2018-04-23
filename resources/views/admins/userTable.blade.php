@@ -56,16 +56,10 @@
       <div class="form-group">
         <label class="control-label col-sm-2" for="name">Name:</label>
         <input type="text" class="form-control" id="ename" placeholder="Enter name" name="ename">
-        @if ($errors->has('name'))
-        <span class="errors">{{$errors->first('name')}}</span>
-        @endif
       </div>
       <div class="form-group">
         <label class="control-label col-sm-2" for="email">Email:</label>       
         <input type="text" class="form-control" id="eemail" placeholder="Enter email" name="eemail">
-        @if ($errors->has('email'))
-        <span class="errors">{{$errors->first('email')}}</span>
-        @endif
       </div>
       <div class="form-group">
         <label class="control-label col-sm-2" for="description">Avata:</label>
@@ -73,18 +67,12 @@
         <input type="file" name="image" id="editfile" onchange="loadFile(event)">
       </div>
       <div class="form-group">
-        @if ($errors->has('phone'))
-        <span class="errors">{{$errors->first('phone')}}</span>
-        @endif
         <label class="control-label" for="phone">Phone:</label>        
         <input type="tel" name="ephone"  class="form-control" id="ephone" value="" placeholder="">
       </div>
       <div class="form-group">
        <label class="control-label col-sm-2" for="name">Address:</label>
        <input type="text" class="form-control" id="eaddress" placeholder="Enter address" name="eaddress">
-       @if ($errors->has('name'))
-       <span class="errors">{{$errors->first('name')}}</span>
-       @endif
      </div>
      <input type="hidden" name="eid" id="eid">
     <div class="modal-footer">
@@ -110,35 +98,25 @@
       <div class="form-group">
         <label class="control-label col-sm-2" for="name">Name:</label>
         <input type="text" class="form-control" id="name" placeholder="Enter name" name="name">
-        @if ($errors->has('name'))
-        <span class="errors">{{$errors->first('name')}}</span>
-        @endif
       </div>
       <div class="form-group">
         <label class="control-label col-sm-2" for="email">Email:</label>       
         <input type="text" class="form-control" id="email" placeholder="Enter email" name="email">
-        @if ($errors->has('email'))
-        <span class="errors">{{$errors->first('email')}}</span>
-        @endif
       </div>
+      <br><br>
       <div class="form-group">
-        <label class="control-label col-sm-2" for="description">Avata:</label>
+        <label class="control-label col-sm-2" for="avata">Avata:</label>
         <img id="imgCreate" class="img img-responsive" width="80%" alt="">
         <input type="file" name="image" id="file" onchange="loadFileC(event)">
       </div>
+      <br><br>
       <div class="form-group">
-        @if ($errors->has('phone'))
-        <span class="errors">{{$errors->first('phone')}}</span>
-        @endif
-        <label class="control-label" for="phone">Phone:</label>        
+        <label class="control-label col-sm-2" for="phone">Phone:</label>        
         <input type="tel" name="phone"  class="form-control" id="phone" value="" placeholder="">
       </div>
       <div class="form-group">
        <label class="control-label col-sm-2" for="name">Address:</label>
        <input type="text" class="form-control" id="address" placeholder="Enter address" name="address">
-       @if ($errors->has('name'))
-       <span class="errors">{{$errors->first('name')}}</span>
-       @endif
      </div>
     <div class="portlet-title">
       <div class="form-group">        
@@ -188,7 +166,6 @@
       newUser.append('address', $('#address').val());
       newUser.append('password', $('#password').val());
       newUser.append('image', file);
-    // console.log($('password').val());
       $.ajax({
         
         url:'{{asset('admin/users/store')}}',
@@ -199,7 +176,6 @@
         processData: false,
         contentType: false,
         success:function(response){
-         console.log(response);
          setTimeout(function () {
            toastr.success('has been added');
                   // window.location.href="{{route('users.index')}}";
@@ -220,20 +196,57 @@
                 '<a  class="btn btn-danger fa fa-trash-o" onclick="alDelete('+response.id+')" >Delete</a>'+
                 '</td>'+
                 '</tr>';
-                console.log(html);
                 $('tbody').prepend(html);
                 $('#create').modal('hide');
 
               }, error: function (xhr, ajaxOptions, thrownError) {
-                console.log(xhr);
-                toastr.error(xhr.responseJSON.message);
-
+                if (!checkNull(xhr.responseJSON.errors)) {
+                  $('p#sperrors').remove();
+                  if(!checkNull(xhr.responseJSON.errors.name))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.name.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.name[i]+'</p>';
+                    $(html).insertAfter('#name');
+                    }
+                  };
+                  if(!checkNull(xhr.responseJSON.errors.email))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.email.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.email[i]+'</p>';
+                    $(html).insertAfter('#email');
+                    }
+                  };
+                  if(!checkNull(xhr.responseJSON.errors.phone))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.phone.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.phone[i]+'</p>';
+                    $(html).insertAfter('#phone');
+                    }
+                  };
+                  if(!checkNull(xhr.responseJSON.errors.address))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.address.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.address[i]+'</p>';
+                    $(html).insertAfter('#address');
+                    }
+                  };
+                  if(!checkNull(xhr.responseJSON.errors.password))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.password.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.password[i]+'</p>';
+                    $(html).insertAfter('#password');
+                    }
+                  };
+                  toastr.error(xhr.responseJSON.message);
+                }
               },
 
             })
     });
 
-
+    function checkNull(value){
+          return (value == null || value === '');
+      }
 
 
   // delete user
@@ -248,11 +261,10 @@
       var editUser = new FormData();
       editUser.append('name', $('#ename').val());
       editUser.append('phone', $('#ephone').val());
-      editUser.append('email', $('#email').val());
+      editUser.append('email', $('#eemail').val());
       editUser.append('address', $('#eaddress').val());
       editUser.append('id', $('#eid').val());
       editUser.append('image', file);
-    // console.log($('password').val());
       $.ajax({
         
         url:'{{asset('admin/users/update')}}',
@@ -263,8 +275,6 @@
         processData: false,
         contentType: false,
           success: function(response){
-            console.log(response);
-        // var result = JSON.parse(response);
         setTimeout(function () {
           toastr.success(response.name+'has been added');
           // window.location.href="{{route('users.index')}}";
@@ -282,29 +292,59 @@
         '<a href="javascript:;" onclick="edituser('+response.id+')" class="btn btn-success" data-toggle="modal" data-target="#edituser" ><i class="fa fa-edit"></i> Sửa </a>' + '<br>'+'<br>'+
         ' <a class="btn btn-danger fa fa-trash-o" onclick="alDelete('+response.id+')" type="submit">Delete</button>'+
         '</td>'
-
-        console.log(html);
         $('#user_'+response.id).html(html);
       }, error: function (xhr, ajaxOptions, thrownError) {
-        console.log(xhr);
-        toastr.error(xhr.responseJSON.message);
-        toastr.error(xhr.responseJSON.message);
-
-      },
-
+                if (!checkNull(xhr.responseJSON.errors)) {
+                  $('p#sperrors').remove();
+                  if(!checkNull(xhr.responseJSON.errors.name))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.name.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.name[i]+'</p>';
+                    $(html).insertAfter('#ename');
+                    }
+                  };
+                  if(!checkNull(xhr.responseJSON.errors.email))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.email.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.email[i]+'</p>';
+                    $(html).insertAfter('#eemail');
+                    }
+                  };
+                  if(!checkNull(xhr.responseJSON.errors.phone))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.phone.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.phone[i]+'</p>';
+                    $(html).insertAfter('#ephone');
+                    }
+                  };
+                  if(!checkNull(xhr.responseJSON.errors.address))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.address.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.address[i]+'</p>';
+                    $(html).insertAfter('#eaddress');
+                    }
+                  };
+                  if(!checkNull(xhr.responseJSON.errors.password))
+                  {
+                    for (var i = 0; i < xhr.responseJSON.errors.password.length; i++) {
+                    var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.password[i]+'</p>';
+                    $(html).insertAfter('#epassword');
+                    }
+                  };
+                  toastr.error(xhr.responseJSON.message);
+                }
+              },
     })
       });
 
 function edituser(id) {
-    console.log(id);
         // $('#edituser').modal('show');
 
         $.ajax({
           type: "GET",
           url: "users/edit/" + id,
 
-          success: function(response)
-          {console.log(response);
+          success: function(response){
             $('#ename').val(response.name);
             $('#eemail').val(response.email);
             $('#ephone').val(response.phone);
@@ -320,7 +360,6 @@ function edituser(id) {
       }
       // Delete function
       function alDelete(id){
-        console.log(id);
         
         swal({
           title: "Bạn có chắc muốn xóa?",

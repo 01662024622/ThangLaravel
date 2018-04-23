@@ -49,7 +49,7 @@
          @endif
          @if($post['status']==2)
          <a href="#" class="btn btn-danger"> Cancelled</a><br><br>
-         <a href="#" class="btn btn-warning fa fa-exclamation-circle"> Reason</a>
+         <a href="javascript:;" onclick="getReason({{$post['id']}})" data-toggle="modal" data-target="#reason" class="btn btn-warning fa fa-exclamation-circle"> Reason</a>
          @endif</td>
         <td>
           <a href="javascript:;" onclick="editPost({{$post['id']}})" class="btn btn-success" data-toggle="modal" data-target="#editPost" ><i class="fa fa-wrench"></i> Repair </a>
@@ -94,7 +94,7 @@
            @if ($errors->has('content'))
            <span class="errors">{{$errors->first('content')}}</span>
            @endif
-           <div>  
+           <div id="econtentdiv">  
              <label class="control-label" for="econtent">Content:</label>        
              <textarea name="econtent" id="econtent" row="10" col="20"></textarea>
            </div>
@@ -145,7 +145,7 @@
         </div>
         <div class="form-group">
          <label class="control-label col-sm-2" for="description">Description:</label>
-         <div>          
+         <div id="descriptiondiv">          
           <input type="text" class="form-control" id="description" placeholder="Please Enter A Description" name="description">
         </div>
         @if ($errors->has('description'))
@@ -197,6 +197,25 @@
 </div>
 </div>
 </div>
+  <!-- modal reason -->
+<div class="modal fade" id="reason">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Reason</h4>
+      </div>
+      <div class="modal-body">
+        <p id="reason">
+          
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 @section('js')
 <script>
@@ -233,6 +252,7 @@
           newPost.append('category_id',$('#category').val());
           newPost.append('tags',$('#tags').val());
           newPost.append('image',file);
+          console.log(newPost);
           $.ajax({
             type:'post',
             url:"posts/store",
@@ -267,46 +287,50 @@
                 $('tbody').prepend(html);
                 $('#create').modal('hide');
           }, error: function (xhr, ajaxOptions, thrownError) {
-            // console.log(xhr.responseJSON.errors);
-            var errors=xhr.responseJSON.errors;
-            console.log(errors);
-            if(!checkNull(xhr.responseJSON.errors.title!==""))
+            console.log(xhr);
+            if (!checkNull(xhr.responseJSON)) {
+              $('p#sperrors').hide();
+            if(!checkNull(xhr.responseJSON.errors.title))
             {
               for (var i = 0; i < xhr.responseJSON.errors.title.length; i++) {
-              var html='<p style="color:red">'+xhr.responseJSON.errors.title[i]+'</p>';
+              var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.title[i]+'</p>';
               console.log(html);
               $(html).insertAfter('#title');
 
               }
             };
-            if(!checkNull(xhr.responseJSON.errors.content!==""))
+            if(!checkNull(xhr.responseJSON.errors.content))
             {
               for (var i = 0; i < xhr.responseJSON.errors.content.length; i++) {
-              var html='<p style="color:red">'+xhr.responseJSON.errors.content[i]+'</p>';
+              var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.content[i]+'</p>';
               console.log(html);
               $(html).insertAfter('#contentdiv');
 
               }
             };
-            if(!checkNull(xhr.responseJSON.errors.descriptiont!==""))
-             {
+            if(!checkNull(xhr.responseJSON.errors.description))
+             {console.log('test ok');
               for (var i = 0; i < xhr.responseJSON.errors.description.length; i++) {
-              var html='<p style="color:red">'+xhr.responseJSON.errors.description[i]+'</p>';
+              var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.description[i]+'</p>';
               console.log(html);
               $(html).insertAfter('#description');
 
               }
             };
-            if(!checkNull(xhr.responseJSON.errors.tags!==""))
+            if(!checkNull(xhr.responseJSON.errors.tags))
              {
               for (var i = 0; i < xhr.responseJSON.errors.tags.length; i++) {
-              var html='<p style="color:red">'+xhr.responseJSON.errors.tags[i]+'</p>';
+              var html='<p id="sperrors" style="color:red">'+xhr.responseJSON.errors.tags[i]+'</p>';
               console.log(html);
               $(html).insertAfter('#tag');
 
               }
-            };
+            }
+            if (!checkNull(xhr.responseJSON.message)) {
+
             toastr.error(xhr.responseJSON.message);
+            }
+          };
 
           },
 
@@ -314,6 +338,7 @@
         });
 
 $('#UpdateBtn').on('click',function(e){
+        console.log($('#etitle').val());
         e.preventDefault();
         var econtent = CKEDITOR.instances.econtent.getData();
           var efile = $('#editfile').get(0).files[0];
@@ -360,42 +385,41 @@ $('#UpdateBtn').on('click',function(e){
         console.log(html);
         $('#user_'+response.id).html(html);
       },  error: function (xhr, ajaxOptions, thrownError) {
-            // console.log(xhr.responseJSON.errors);
-            var errors=xhr.responseJSON.errors;
-            console.log(errors);
-            if(!checkNull(xhr.responseJSON.errors.title!==""))
-            {
+            console.log(xhr.responseJSON.errors);
+            $("p.sperrors").replaceWith("");
+            if(!checkNull(xhr.responseJSON.errors.title))
+            { 
               for (var i = 0; i < xhr.responseJSON.errors.title.length; i++) {
-              var html='<p style="color:red">'+xhr.responseJSON.errors.title[i]+'</p>';
+              var html='<p class="sperrors" style="color:red">'+xhr.responseJSON.errors.title[i]+'</p>';
               console.log(html);
-              $(html).insertAfter('#title');
+              $(html).insertAfter('#etitle');
 
               }
             };
-            if(!checkNull(xhr.responseJSON.errors.content!==""))
+            if(!checkNull(xhr.responseJSON.errors.content))
             {
               for (var i = 0; i < xhr.responseJSON.errors.content.length; i++) {
-              var html='<p style="color:red">'+xhr.responseJSON.errors.content[i]+'</p>';
+              var html='<p class="sperrors" style="color:red">'+xhr.responseJSON.errors.content[i]+'</p>';
               console.log(html);
-              $(html).insertAfter('#contentdiv');
+              $(html).insertAfter('#econtentdiv');
 
               }
             };
-            if(!checkNull(xhr.responseJSON.errors.descriptiont!==""))
+            if(!checkNull(xhr.responseJSON.errors.description))
              {
               for (var i = 0; i < xhr.responseJSON.errors.description.length; i++) {
-              var html='<p style="color:red">'+xhr.responseJSON.errors.description[i]+'</p>';
+              var html='<p  class="sperrors" style="color:red">'+xhr.responseJSON.errors.description[i]+'</p>';
               console.log(html);
-              $(html).insertAfter('#description');
+              $(html).insertAfter('#edescription');
 
               }
             };
-            if(!checkNull(xhr.responseJSON.errors.tags!==""))
+            if(!checkNull(xhr.responseJSON.errors.tags))
              {
               for (var i = 0; i < xhr.responseJSON.errors.tags.length; i++) {
-              var html='<p style="color:red">'+xhr.responseJSON.errors.tags[i]+'</p>';
+              var html='<p class="sperrors" style="color:red">'+xhr.responseJSON.errors.tags[i]+'</p>';
               console.log(html);
-              $(html).insertAfter('#tag');
+              $(html).insertAfter('#etag');
 
               }
             };
@@ -439,7 +463,6 @@ $('#UpdateBtn').on('click',function(e){
       // Delete function
       function alDelete(id){
         console.log(id);
-        var path = "posts/" + id;
         swal({
           title: "Bạn có chắc muốn xóa?",
         // text: "Bạn sẽ không thể khôi phục lại bản ghi này!!",
@@ -454,7 +477,7 @@ $('#UpdateBtn').on('click',function(e){
         if (isConfirm) {
           $.ajax({
             type: "delete",
-            url: path,
+            url: {{ asset('posts') }}+'/'+id,
             success: function(res)
             {
 
@@ -478,6 +501,26 @@ $('#UpdateBtn').on('click',function(e){
       function checkNull(value){
           return (value == null || value === '');
       }
+      function getReason(id){
+        $.ajax({
+            type: "post",
+            url: "getReason/"+id,
+            success: function(response)
+            {
+              console.log(response);
+              if (response.notice==null) {
+                $("p#reason").append("Admin Không Để Lại Lý Do");
+                console.log('test');
+              }else{
+                $("p#reason").append(response.notice);
+              }
+
+            },
+              error: function (xhr, ajaxOptions, thrownError) {
+                toastr.error(thrownError);
+              }
+      })
+    }
     </script>
     @endsection
   
